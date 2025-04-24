@@ -28,6 +28,7 @@ type Config struct {
 
 var (
 	connMap         = make(map[string]*net.UDPAddr)
+	allowedTargets  = make(map[string]bool) // store known target IPs
 	connMutex       sync.Mutex
 	config          *Config
 	logger          *log.Logger
@@ -60,6 +61,7 @@ func main() {
 
 	go captureAndForward(config.PS5Interface)
 	go captureResponses(config.InternetInterface)
+	go monitorConnectivity()
 
 	go func() {
 		cmd.Wait()
@@ -169,6 +171,7 @@ func captureAndForward(iface string) {
 
 		connMutex.Lock()
 		connMap[destAddr] = ps5Addr
+		allowedTargets[ip.DstIP.String()] = true // track known targets
 		connMutex.Unlock()
 
 		go func(dest string, data []byte) {
@@ -214,9 +217,10 @@ func captureResponses(iface string) {
 
 		connMutex.Lock()
 		ps5Addr, exists := connMap[srcKey]
+		isAllowed := allowedTargets[ip.SrcIP.String()]
 		connMutex.Unlock()
 
-		if !exists {
+		if !exists || !isAllowed {
 			continue
 		}
 
@@ -231,5 +235,16 @@ func captureResponses(iface string) {
 			warn("Failed to write response to PS5 %s: %v", ps5Addr.String(), err)
 		}
 		conn.Close()
+	}
+}
+
+func monitorConnectivity() {
+	for {
+		time.Sleep(10 * time.Second)
+		_, err := net.DialTimeout("ip4:icmp", "8.8.8.8", 3*time.Second)
+		if err != nil {
+			errorLog("Ping to 8.8.8.8 failed. Exiting application.")
+			os.Exit(1)
+		}
 	}
 }
