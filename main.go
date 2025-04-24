@@ -151,14 +151,14 @@ func captureAndForward(iface string) {
 	info("Listening for PS5 on: %s", iface)
 
 	for packet := range packetSource.Packets() {
-		fmt.Println("[DEBUG] Packet captured from PS5 interface:", packet.String())
-
 		udpLayer := packet.Layer(layers.LayerTypeUDP)
 		ipLayer := packet.Layer(layers.LayerTypeIPv4)
 
 		if udpLayer == nil || ipLayer == nil {
 			continue
 		}
+
+		fmt.Println("[DEBUG] Packet captured from PS5 interface:", packet.String())
 
 		udp := udpLayer.(*layers.UDP)
 		ip := ipLayer.(*layers.IPv4)
@@ -200,8 +200,6 @@ func captureResponses(iface string) {
 	info("Listening for responses on: %s", iface)
 
 	for packet := range packetSource.Packets() {
-		fmt.Println("[DEBUG] Packet captured from internet interface:", packet.String())
-
 		udpLayer := packet.Layer(layers.LayerTypeUDP)
 		ipLayer := packet.Layer(layers.LayerTypeIPv4)
 
