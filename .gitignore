@@ -1,0 +1,22 @@
+# Go build outputs
+*.exe
+*.out
+*.syso
+
+# Log files
+*.log
+*.bak
+
+# Configuration (opcional, se quiser manter fora do repositório)
+config.json
+
+# Go modules (opcional — geralmente são versionados)
+go.mod
+go.sum
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

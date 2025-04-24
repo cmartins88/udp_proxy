@@ -1,0 +1,8 @@
+{
+    "ps5_interface": "\\Device\\NPF_{...}",
+    "internet_interface": "\\Device\\NPF_{...}",
+    "exitlag_path": "C:\\Program Files\\ExitLag\\ExitLag.exe",
+    "log_file": "proxy.log",
+    "max_log_size_bytes": 1048576,
+    "log_level": "info"
+}
